@@ -14,10 +14,10 @@ class Admin
 	}
 
 	public function add_admin_pages() {
-		add_menu_page( 'Starter Plugin', 'StarterPlugin', 'manage_options', 'starter_plugin', array( $this, 'admin_index' ), 'dashicons-store', 110 );
+		add_menu_page( 'Customer Check-In', 'Check-In', 'manage_options', 'woocusch_customer_checking', array( $this, 'woocusch_customer_checking' ), 'dashicons-location-alt', 50 );
 	}
 
-	public function admin_index() {
+	public function woocusch_customer_checking() {
 		require_once PLUGIN_PATH . 'templates/admin.php';
 	}
 }

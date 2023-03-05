@@ -12,9 +12,11 @@ final class PluginInit
 	{
 		return [
 			Pages\Admin\Admin::class,
+			Base\AddCustomFieldToCheckout::class,
 			Base\AdminEnqueue::class,
 			Base\PublicEnqueue::class,
-			Base\SettingsLinks::class
+			Base\SettingsLinks::class,
+			// Base\DraftsListTable::class,
 		];
 	}
 

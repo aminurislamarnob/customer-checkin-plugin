@@ -1,0 +1,9 @@
+.woocusch-customer-checkout-extra-info {
+    overflow: hidden;
+}
+
+.woocusch-customer-checkout-extra-info h5 {
+    margin-bottom: 0;
+    text-transform: capitalize;
+    font-size: 22px;
+}

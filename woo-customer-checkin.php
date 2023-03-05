@@ -1,13 +1,13 @@
 <?php
 /*
-Plugin Name: WP Plugin Starter Pack
+Plugin Name: Woo Customer Checkin
 Plugin URI: https://aiarnob.com/
-Description: WordPress OOP Plugin Starter Pack
+Description: Sell service and customer physical location checkin plugin for WooCommerce.
 Version: 1.0.0
 Author: Aminur Islam Arnob
 Author URI: https://aiarnob.com/
 License: GPLv2 or later
-Text Domain: plugin-starter-pack
+Text Domain: woo-customer-checkin
 */
 
 // If this file is called firectly, abort!!!
@@ -31,19 +31,19 @@ use IncPath\PluginInit;
 /**
  * The code that runs during plugin activation
  */
-function activate_wp_starter_plugin() {
+function activate_woo_customer_checkin() {
 	Activate::activate();
 }
 
 /**
  * The code that runs during plugin deactivation
  */
-function deactivate_wp_starter_plugin() {
+function deactivate_woo_customer_checkin() {
 	Deactivate::deactivate();
 }
 
-register_activation_hook( __FILE__, 'activate_wp_starter_plugin' );
-register_deactivation_hook( __FILE__, 'deactivate_wp_starter_plugin' );
+register_activation_hook( __FILE__, 'activate_woo_customer_checkin' );
+register_deactivation_hook( __FILE__, 'deactivate_woo_customer_checkin' );
 
 /**
  * Initialize all the core classes of the plugin

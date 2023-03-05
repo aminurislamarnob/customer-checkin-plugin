@@ -1,0 +1,40 @@
+.woocusch_field {
+    height: 45px;
+    border-radius: 4px!important;
+    padding: 5px 20px!important;
+    font-size: 15px!important;
+    margin: 0!important;
+}
+
+.custom-customer-search input[type=search] {
+    min-width: 250px!important;
+    border-radius: 0px!important;
+    border-right: 0px;
+}
+
+.custom-customer-search input#search-submit {
+    height: 45px;
+    font-size: 15px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-top-left-radius: 0px!important;
+    border-bottom-left-radius: 0px!important;
+}
+#woocusch-orders-forms .tablenav.top {
+    display: none;
+}
+
+p.search-box.custom-customer-search {
+    float: left;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    display: flex;
+    background: #fff;
+    padding: 15px;
+    border-radius: 4px;
+}
+select.woocusch_field {
+    border-top-right-radius: 0px!important;
+    border-bottom-right-radius: 0px!important;
+    border-right: 0px;
+}
