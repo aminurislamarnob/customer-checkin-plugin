@@ -3,6 +3,19 @@
 if ( file_exists( PLUGIN_PATH . 'inc/Base/CheckInOrderListTable.php' ) ) {
 	require_once PLUGIN_PATH . 'inc/Base/CheckInOrderListTable.php';
 }
+
+//send checkin mail to customer
+if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['checkin']) && isset($_POST['customer_email']) && isset($_POST['count'])) {
+    $customer_email = $_POST['customer_email'];
+    $customer_name = $_POST['customer_name'];
+    $order_id = $_POST['order_id'];
+    $admin_email = get_option( 'admin_email' );
+    $order_url = wc_get_endpoint_url( 'view-order', $_POST['order_id'], wc_get_page_permalink( 'myaccount' ) );
+    $meta_counter = $_POST['count'];
+    require_once PLUGIN_PATH . 'templates/check-in-email.php';
+}
+
+
 /**
  * This function is responsible for render the drafts table
  */
@@ -22,11 +35,10 @@ $woocusch_order_table = new CheckInOrderListTable();
 	        <input class="woocusch_field" type="search" id="search-search-input" placeholder="Search text..." name="search_text" value="<?php echo isset($_REQUEST['search_text']) ? $_REQUEST['search_text'] : ''; ?>">
 		    <input type="submit" id="search-submit" class="button button-primary button-large" value="Search Customer">
         </p>
-
+        </form>
         <?php
         $woocusch_order_table->prepare_items();
         // $woocusch_order_table->search_box( 'Search', 'search' );
         $woocusch_order_table->display();
         ?>
-    </form>
 </div>

@@ -272,7 +272,24 @@ class CheckInOrderListTable extends WP_List_Table {
 					<td><strong><?php echo $i; ?></strong></td>
 					<td><?php echo get_post_meta($order->get_id(), 'woocusch_customer_name_' . $i, true ); ?></td>
 					<td><?php echo get_post_meta($order->get_id(), 'woocusch_customer_email_' . $i, true ); ?></td>
-					<td><button class="button button-primary button-small">Check-In</button></td>
+					<td>
+					    <?php 
+					    $is_set_wocusch_mail =  get_post_meta($order->get_id(), 'is_woocusch_mail_sent_' . $i, true );
+					    if($is_set_wocusch_mail == 1){
+					    ?>
+					    <button class="button button-success button-small checked-btn" name="checkin" disabled>Already Checked-In</button>
+					    <?php 
+					    }else{
+					    ?>
+						<form action="" method="POST">
+							<input type="hidden" name="customer_email" value="<?php echo get_post_meta($order->get_id(), 'woocusch_customer_email_' . $i, true ); ?>">
+							<input type="hidden" name="customer_name" value="<?php echo get_post_meta($order->get_id(), 'woocusch_customer_name_' . $i, true ); ?>">
+							<input type="hidden" name="order_id" value="<?php echo $order->get_id(); ?>">
+							<input type="hidden" name="count" value="<?php echo $i; ?>">
+							<button type="submit" class="button button-primary button-small" name="checkin">Check-In</button>
+						</form>
+						<?php } ?>
+					</td>
 				</tr>
 			<?php } ?>
 			</tbody>
