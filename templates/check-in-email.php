@@ -165,23 +165,18 @@ table[class=body] .article {
 </html>
 ';
 
+$attachment = array(PLUGIN_PATH . '/certificates/' . $certificate_name . '.pdf');
 
-// wp_mail($sendto, $sendsub, $message, $headers);
 // Sending email
-if(wp_mail($sendto, $sendsub, $message, $headers)){
+$sentStatus = [];
+if(wp_mail($sendto, $sendsub, $message, $headers, $attachment)){
     //update mail sent status meta value on success
     update_post_meta($order_id, 'is_woocusch_mail_sent_' . $meta_counter, '1');
-    ?>
-    <div class="notice notice-success is-dismissible">
-        <p><?php _e( 'Check-In confirmation mail successfully sent to customer email address.', 'woo-customer-checkin' ); ?></p>
-    </div>
-    <?php
+    $sent_status = $sentStatus['mail_sent'] = 1;
+    echo json_encode($sent_status);
 } else{
     //update mail sent status meta value on fail
     update_post_meta($order_id, 'is_woocusch_mail_sent_' . $meta_counter, '0');
-    ?>
-    <div class="notice notice-error is-dismissible">
-        <p><?php _e( 'Failed to sent check-in confirmation mail.', 'woo-customer-checkin' ); ?></p>
-    </div>
-    <?php
+    $sent_status = $sentStatus['mail_sent'] = 0;
+    echo json_encode($sent_status);
 }

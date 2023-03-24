@@ -1,19 +1,21 @@
 <?php
 // Require once the Composer Autoload
+
 if ( file_exists( PLUGIN_PATH . 'inc/Base/CheckInOrderListTable.php' ) ) {
 	require_once PLUGIN_PATH . 'inc/Base/CheckInOrderListTable.php';
 }
 
 //send checkin mail to customer
-if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['checkin']) && isset($_POST['customer_email']) && isset($_POST['count'])) {
-    $customer_email = $_POST['customer_email'];
-    $customer_name = $_POST['customer_name'];
-    $order_id = $_POST['order_id'];
-    $admin_email = get_option( 'admin_email' );
-    $order_url = wc_get_endpoint_url( 'view-order', $_POST['order_id'], wc_get_page_permalink( 'myaccount' ) );
-    $meta_counter = $_POST['count'];
-    require_once PLUGIN_PATH . 'templates/check-in-email.php';
-}
+//if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['checkin']) && isset($_POST['customer_email']) && isset($_POST['count'])) {
+//    $customer_email = $_POST['customer_email'];
+//    $customer_name = $_POST['customer_name'];
+//    $order_id = $_POST['order_id'];
+//    $admin_email = get_option( 'admin_email' );
+//    $order_url = wc_get_endpoint_url( 'view-order', $_POST['order_id'], wc_get_page_permalink( 'myaccount' ) );
+//    $meta_counter = $_POST['count'];
+//
+//    require_once PLUGIN_PATH . 'templates/check-in-email.php';
+//}
 
 
 /**
@@ -21,7 +23,17 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['checkin']) && isset($_
  */
 $woocusch_order_table = new CheckInOrderListTable();
 ?>
-<div class="wrap">
+<div id="woocusch_loader" style="display: none;">
+    <div class="sk-chase">
+        <div class="sk-chase-dot"></div>
+        <div class="sk-chase-dot"></div>
+        <div class="sk-chase-dot"></div>
+        <div class="sk-chase-dot"></div>
+        <div class="sk-chase-dot"></div>
+        <div class="sk-chase-dot"></div>
+    </div>
+</div>
+<div class="wrap checkin-table">
     <h2><?php esc_html_e( 'Customers Informations by Orders', 'admin-table-tut' ); ?></h2>
     <form id="woocusch-orders-forms" method="get">
         <input type="hidden" name="page" value="woocusch_customer_checking" />

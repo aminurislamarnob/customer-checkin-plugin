@@ -1,3 +1,6 @@
+# ***Must Need to enable gd extension on server
+
+
 # Customer Checkin Plugin
 1. Suppose customer select a service with quantity 5. That means they are 5 person.
 2. Need to take 5 name & email address during checkout.

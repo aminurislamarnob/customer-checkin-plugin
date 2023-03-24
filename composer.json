@@ -10,7 +10,9 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {},
+    "require": {
+        "mpdf/mpdf": "dev-development"
+    },
     "autoload": {
         "psr-4": {"IncPath\\": "./inc"}
     }

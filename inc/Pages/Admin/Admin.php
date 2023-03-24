@@ -17,7 +17,7 @@ class Admin
 		add_menu_page( 'Customer Check-In', 'Check-In', 'manage_options', 'woocusch_customer_checking', array( $this, 'woocusch_customer_checking' ), 'dashicons-location-alt', 50 );
 	}
 
-	public function woocusch_customer_checking() {
+    public function woocusch_customer_checking() {
 		require_once PLUGIN_PATH . 'templates/admin.php';
 	}
 }

@@ -134,6 +134,7 @@ class CheckInOrderListTable extends WP_List_Table {
 			$post_args['meta_query'] = array(
 				array(
 					'value' => trim($search_text),
+                    'compare' => 'LIKE',
 				)
 			);
 
@@ -175,9 +176,9 @@ class CheckInOrderListTable extends WP_List_Table {
 				$result = '<span title="' . $t_time . '">' . apply_filters( 'post_date_column_time', $h_time, $item['id'], 'date', 'list' ) . '</span>';
 				break;
 
-			case 'author':
-				$result = $item['author'];
-				break;
+//			case 'author':
+//				$result = $item['author'];
+//				break;
 
 			case 'type':
 				$result = $item['type'];
@@ -198,7 +199,7 @@ class CheckInOrderListTable extends WP_List_Table {
 			'title'  => __( 'Order', 'admin-table-tut' ),
 			'customer'  => __( 'Customers', 'admin-table-tut' ),
 			// 'type'   => __( 'Type', 'admin-table-tut' ),
-			'author' => __( 'Author', 'admin-table-tut' ),
+//			'author' => __( 'Author', 'admin-table-tut' ),
 			'date'   => __( 'Date', 'admin-table-tut' ),
 		);
 	}
@@ -277,15 +278,32 @@ class CheckInOrderListTable extends WP_List_Table {
 					    $is_set_wocusch_mail =  get_post_meta($order->get_id(), 'is_woocusch_mail_sent_' . $i, true );
 					    if($is_set_wocusch_mail == 1){
 					    ?>
-					    <button class="button button-success button-small checked-btn" name="checkin" disabled>Already Checked-In</button>
+					        <button class="button button-success button-small checked-btn" name="checkin" disabled>Already Checked-In</button>
+                            <?php
+                            $name_without_space = preg_replace('/\s+/', '_', strtolower(get_post_meta($order->get_id(), 'woocusch_customer_name_' . $i, true )));
+                            $certificate_name = 'Red-White-Professional-Certificate-Of-Appreciation' . $i . $order->get_id() . '_' . get_post_meta($order->get_id(), 'woocusch_customer_email_' . $i, true ) . '_' . $name_without_space;
+                            $certificate_full_path = PLUGIN_PATH . '/certificates/' . $certificate_name . '.pdf';
+                            if (file_exists($certificate_full_path)) {
+                            ?>
+                                <a href="<?php echo PLUGIN_URL . '/certificates/' . $certificate_name . '.pdf'; ?>" class="woocusch-action-btn" title="Download certificate" target="_blank" download><span class="dashicons dashicons-pdf"></span></a>
+                            <?php } ?>
+                            <form class="customer-checkin-form" method="POST">
+                                <input type="hidden" name="customer_email" value="<?php echo get_post_meta($order->get_id(), 'woocusch_customer_email_' . $i, true ); ?>">
+                                <input type="hidden" name="customer_name" value="<?php echo get_post_meta($order->get_id(), 'woocusch_customer_name_' . $i, true ); ?>">
+                                <input type="hidden" name="order_id" value="<?php echo $order->get_id(); ?>">
+                                <input type="hidden" name="count" value="<?php echo $i; ?>">
+                                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce("woocusch_checkin_nonce"); ?>">
+                                <button type="submit" class="button button-primary button-small woocusch-action-btn" name="checkin" title="Resend mail"><span class="dashicons dashicons-redo"></span></button>
+                            </form>
 					    <?php 
 					    }else{
 					    ?>
-						<form action="" method="POST">
+						<form class="customer-checkin-form" method="POST">
 							<input type="hidden" name="customer_email" value="<?php echo get_post_meta($order->get_id(), 'woocusch_customer_email_' . $i, true ); ?>">
 							<input type="hidden" name="customer_name" value="<?php echo get_post_meta($order->get_id(), 'woocusch_customer_name_' . $i, true ); ?>">
 							<input type="hidden" name="order_id" value="<?php echo $order->get_id(); ?>">
 							<input type="hidden" name="count" value="<?php echo $i; ?>">
+                            <input type="hidden" name="nonce" value="<?php echo wp_create_nonce("woocusch_checkin_nonce"); ?>">
 							<button type="submit" class="button button-primary button-small" name="checkin">Check-In</button>
 						</form>
 						<?php } ?>
