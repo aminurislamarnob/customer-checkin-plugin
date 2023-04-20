@@ -263,6 +263,7 @@ class CheckInOrderListTable extends WP_List_Table {
 					<td class="" width="25">#</td>
 					<td>Name</td>
 					<td>Email</td>
+					<td>Check-in/Expire Date</td>
 					<td>Action</td>
 				</tr>
 			</thead>
@@ -273,6 +274,19 @@ class CheckInOrderListTable extends WP_List_Table {
 					<td><strong><?php echo $i; ?></strong></td>
 					<td><?php echo get_post_meta($order->get_id(), 'woocusch_customer_name_' . $i, true ); ?></td>
 					<td><?php echo get_post_meta($order->get_id(), 'woocusch_customer_email_' . $i, true ); ?></td>
+					<td>
+						<?php 
+							$check_in_date = get_post_meta($order->get_id(), 'woocusch_customer_checkin_' . $i, true );
+							if(!empty($check_in_date)){
+								echo 'Checked In: ' . $check_in_date;
+							}
+		
+							$expired_on = get_post_meta($order->get_id(), 'woocusch_customer_certificate_expire_date_' . $i, true );
+							if(!empty($expired_on)){
+								echo '<br>Expired On: ' . $expired_on;
+							}
+						?>
+					</td>
 					<td>
 					    <?php 
 					    $is_set_wocusch_mail =  get_post_meta($order->get_id(), 'is_woocusch_mail_sent_' . $i, true );
@@ -295,9 +309,9 @@ class CheckInOrderListTable extends WP_List_Table {
                                 <input type="hidden" name="nonce" value="<?php echo wp_create_nonce("woocusch_checkin_nonce"); ?>">
                                 <button type="submit" class="button button-primary button-small woocusch-action-btn" name="checkin" title="Resend mail"><span class="dashicons dashicons-redo"></span></button>
                             </form>
-					    <?php 
+							<?php 
 					    }else{
-					    ?>
+							?>
 						<form class="customer-checkin-form" method="POST">
 							<input type="hidden" name="customer_email" value="<?php echo get_post_meta($order->get_id(), 'woocusch_customer_email_' . $i, true ); ?>">
 							<input type="hidden" name="customer_name" value="<?php echo get_post_meta($order->get_id(), 'woocusch_customer_name_' . $i, true ); ?>">

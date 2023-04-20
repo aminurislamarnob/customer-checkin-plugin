@@ -1,4 +1,5 @@
 # ***Must Need to enable gd extension on server
+# ***Must Need to add coupon discount percentance from: WooCommerce settings->products->Woo Customer Checking Settings
 
 
 # Customer Checkin Plugin
@@ -21,3 +22,6 @@ He can see the list of names and emails by order
 he can search by name or email
 He can mark a service taker by clicking on the check-in button beside the name
 The service taker will get a confirmation mail, that he has successfully checked in 
+
+## Schedule Mail
+Customer will get certificate expire mail before 15, 7 & 1 days with generated coupon code.
