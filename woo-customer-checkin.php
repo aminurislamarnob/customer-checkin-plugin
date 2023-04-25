@@ -35,6 +35,7 @@ use IncPath\PluginInit;
 function activate_woo_customer_checkin() {
 	// Activate::activate();
     wp_schedule_event( time(), 'daily', 'woo_customer_certificate_validity_event_daily'); //Run daily
+    wp_schedule_event( time(), 'daily_after_1hours', 'woo_customer_certificate_validity_event_daily_after_1hour'); //Run daily+2 hours
     wp_schedule_event( time(), 'daily_after_2hours', 'woo_customer_certificate_validity_event_daily_after_2hours'); //Run daily+2 hours
     wp_schedule_event( time(), 'daily_after_4hours', 'woo_customer_certificate_validity_event_daily_after_4hours'); //Run daily+4 hours
 }
@@ -42,8 +43,66 @@ function activate_woo_customer_checkin() {
 /**
  * Run daily cron event to check certificate validity
  */
-add_action( 'woo_customer_certificate_validity_event_daily', 'woo_customer_certificate_validity' );
-function woo_customer_certificate_validity(){
+add_action( 'woo_customer_certificate_validity_event_daily', 'woo_customer_certificate_validity_daily' );
+function woo_customer_certificate_validity_daily(){
+    $post_args = array(
+        'post_type'      => 'shop_order',
+        'post_status'       =>  array_keys( wc_get_order_statuses() ),
+        'posts_per_page' => -1,
+    );
+    $query = new WP_Query( $post_args );
+
+    if ( $query->have_posts() ) :
+        while ( $query->have_posts() ) : $query->the_post();
+            $order = new \WC_Order( get_the_ID() );
+            for($i=1; $i<=$order->get_item_count(); $i++){
+                $timestamp = get_post_meta($order->get_id(), 'woocusch_customer_checkin_' . $i, true );
+                if(!empty($timestamp)){
+                    $customer_email = get_post_meta($order->get_id(), 'woocusch_customer_email_' . $i, true );
+                    $customer_name = get_post_meta($order->get_id(), 'woocusch_customer_name_' . $i, true );
+                    $customer_customer_certificate_expired_on = get_post_meta($order->get_id(), 'woocusch_customer_certificate_expire_date_' . $i, true );
+                    $admin_email = get_option( 'admin_email' );
+                    $order_id = $order->get_id();
+                    $order_url = wc_get_endpoint_url( 'view-order', $order_id, wc_get_page_permalink( 'myaccount' ) );
+
+
+                    // Define the future date
+                    $certificate_expired = new DateTime($customer_customer_certificate_expired_on);
+
+                    // Get the current date
+                    $current_date = new DateTime();
+
+                    // Calculate the difference between the two dates in days
+                    $diff = $current_date->diff($certificate_expired);
+                    $total_days = $diff->format('%a');
+                    
+                    //generate coupon name
+                    $coupon_name = generate_coupon_name($customer_name, $order_id);
+                    $coupon_percent = get_option('woocusch_customer_checking_coupon_percentace_30');
+
+                    if($total_days == 30){
+                        //sent mail before 30 days
+
+                        //create coupon
+                        $coupon = create_certificate_purchase_coupon($coupon_name, $coupon_percent, $customer_customer_certificate_expired_on, $customer_email);
+
+                        //mail functions
+                        require PLUGIN_PATH . 'templates/certificate-expire-alert-email.php';
+                    }
+                }
+
+            }
+        endwhile;
+    endif;
+
+    wp_reset_postdata();
+}
+
+/**
+ * Run daily after 1 hour cron event to check certificate validity
+ */
+add_action( 'woo_customer_certificate_validity_event_daily_after_1hour', 'woo_customer_certificate_validity_daily_after_1_hour' );
+function woo_customer_certificate_validity_daily_after_1_hour(){
     $post_args = array(
         'post_type'      => 'shop_order',
         'post_status'       =>  array_keys( wc_get_order_statuses() ),
@@ -341,7 +400,7 @@ function woocusch_gd_extension_admin_notice__error() {
         $message = __( 'GD support is not enabled for "Woo Customer Checkin" plugin. To enable GD extension on server please follow the link: https://www.hostingb2b.com/blog/how-to-ebable-the-gd-extension-of-php-using-cloudlinux-selector-in-cpanel/', 'woo-customer-checkin' );  printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
     }
 
-    if( empty(get_option('woocusch_customer_checking_coupon_percentace_15')) || empty(get_option('woocusch_customer_checking_coupon_percentace_7')) || empty(get_option('woocusch_customer_checking_coupon_percentace_1')) ){
+    if( empty(get_option('woocusch_customer_checking_coupon_percentace_30')) || empty(get_option('woocusch_customer_checking_coupon_percentace_15')) || empty(get_option('woocusch_customer_checking_coupon_percentace_7')) || empty(get_option('woocusch_customer_checking_coupon_percentace_1')) ){
         $class = 'notice notice-error';
         $link = '<a href="'.get_admin_url().'admin.php?page=wc-settings&tab=products&section=woocusch_customer_checking_settings">'.get_admin_url().'admin.php?page=wc-settings&tab=products&section=woocusch_customer_checking_settings</a>';
         $message = __( 'Please enter coupon discount percentance. Go to the link: ', 'woo-customer-checkin' );  
@@ -356,13 +415,17 @@ add_action( 'admin_notices', 'woocusch_gd_extension_admin_notice__error' );
  * Custom Cron Schedules
  */
 function woocusch_custom_cron_schedules( $schedules ) {
+    $schedules['daily_after_1hours'] = array(
+        'interval' => 90000,
+        'display' => __('Once Daily After 1 Hour (Each 25 hours)')
+    );
 	$schedules['daily_after_2hours'] = array(
 		'interval' => 93600,
-		'display' => __('Once Daily After 2 Hours')
+		'display' => __('Once Daily After 2 Hours (Each 26 hours)')
 	);
     $schedules['daily_after_4hours'] = array(
 		'interval' => 100800,
-		'display' => __('Once Daily After 4 Hours')
+		'display' => __('Once Daily After 4 Hours (Each 28 hours)')
 	);
 	return $schedules;
 }
@@ -397,20 +460,26 @@ function woocusch_all_settings( $settings, $current_section ) {
 		$settings_slider[] = array( 'name' => __( 'Woo Customer Checking Settings', 'woo-customer-checkin' ), 'type' => 'title', 'desc' => __( 'The following options are used to configure Woo Customer Checking Plugin', 'woo-customer-checkin' ), 'id' => 'woocusch_customer_checking_title' );
 		// Add first text field option
 		$settings_slider[] = array(
-			'name'     => __( 'Coupon discount on 15 days', 'woo-customer-checkin' ),
-			'desc_tip' => __( 'Discount percentance on 15 days', 'woo-customer-checkin' ),
+			'name'     => __( 'Coupon discount before 30 days', 'woo-customer-checkin' ),
+			'desc_tip' => __( 'Discount percentance before 30 days', 'woo-customer-checkin' ),
+			'id'       => 'woocusch_customer_checking_coupon_percentace_30',
+			'type'     => 'number',
+		);
+		$settings_slider[] = array(
+			'name'     => __( 'Coupon discount before 15 days', 'woo-customer-checkin' ),
+			'desc_tip' => __( 'Discount percentance before 15 days', 'woo-customer-checkin' ),
 			'id'       => 'woocusch_customer_checking_coupon_percentace_15',
 			'type'     => 'number',
 		);
         $settings_slider[] = array(
-			'name'     => __( 'Coupon discount on 07 days', 'woo-customer-checkin' ),
-			'desc_tip' => __( 'Discount percentance on 07 days', 'woo-customer-checkin' ),
+			'name'     => __( 'Coupon discount before 07 days', 'woo-customer-checkin' ),
+			'desc_tip' => __( 'Discount percentance before 07 days', 'woo-customer-checkin' ),
 			'id'       => 'woocusch_customer_checking_coupon_percentace_7',
 			'type'     => 'number',
 		);
         $settings_slider[] = array(
-			'name'     => __( 'Coupon discount on 01 days', 'woo-customer-checkin' ),
-			'desc_tip' => __( 'Discount percentance on 01 days', 'woo-customer-checkin' ),
+			'name'     => __( 'Coupon discount before 01 days', 'woo-customer-checkin' ),
+			'desc_tip' => __( 'Discount percentance before 01 days', 'woo-customer-checkin' ),
 			'id'       => 'woocusch_customer_checking_coupon_percentace_1',
 			'type'     => 'number',
 		);
