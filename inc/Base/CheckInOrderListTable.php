@@ -263,6 +263,7 @@ class CheckInOrderListTable extends WP_List_Table {
 					<td class="" width="25">#</td>
 					<td>Name</td>
 					<td>Email</td>
+					<td>Date of Birth</td>
 					<td>Check-in/Expire Date</td>
 					<td>Action</td>
 				</tr>
@@ -274,6 +275,7 @@ class CheckInOrderListTable extends WP_List_Table {
 					<td><strong><?php echo $i; ?></strong></td>
 					<td><?php echo get_post_meta($order->get_id(), 'woocusch_customer_name_' . $i, true ); ?></td>
 					<td><?php echo get_post_meta($order->get_id(), 'woocusch_customer_email_' . $i, true ); ?></td>
+					<td><?php echo get_post_meta($order->get_id(), 'woocusch_customer_dob_' . $i, true ); ?></td>
 					<td>
 						<?php 
 							$check_in_date = get_post_meta($order->get_id(), 'woocusch_customer_checkin_' . $i, true );

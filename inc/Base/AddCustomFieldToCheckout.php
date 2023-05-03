@@ -50,6 +50,18 @@ class AddCustomFieldToCheckout{
                 'placeholder' => __('') ,
                 'required' => true,
             ) , $checkout->get_value('woocusch_customer_email_' . $i));
+
+            //date of birth field
+            woocommerce_form_field('woocusch_customer_dob_' . $i, array(
+                'type' => 'date',
+                'class' => array(
+                    'woocusch-field form-row form-row-first'
+                ) ,
+                'label' => __('Customer Date of Birth') ,
+                'placeholder' => __('') ,
+                'required' => true,
+            ) , $checkout->get_value('woocusch_customer_dob_' . $i));
+
             echo '</div>';
         }
         echo '</div>';
@@ -62,6 +74,7 @@ class AddCustomFieldToCheckout{
         for($i=1; $i<=$total_items; $i++){
             if (!$_POST['woocusch_customer_name_' . $i]) wc_add_notice(__('Please enter 0'.$i.' customer name.') , 'error');
             if (!$_POST['woocusch_customer_email_' . $i]) wc_add_notice(__('Please enter 0'.$i.' customer email.') , 'error');
+            if (!$_POST['woocusch_customer_dob_' . $i]) wc_add_notice(__('Please enter 0'.$i.' customer date of birth.') , 'error');
         }
     }
 
@@ -76,6 +89,9 @@ class AddCustomFieldToCheckout{
             if (!empty($_POST['woocusch_customer_email_' . $i])) {
                 update_post_meta($order_id, 'woocusch_customer_email_' . $i, sanitize_text_field($_POST['woocusch_customer_email_' . $i]));
             }
+            if (!empty($_POST['woocusch_customer_dob_' . $i])) {
+                update_post_meta($order_id, 'woocusch_customer_dob_' . $i, sanitize_text_field($_POST['woocusch_customer_dob_' . $i]));
+            }
         }
     }
 
@@ -86,7 +102,7 @@ class AddCustomFieldToCheckout{
         for($i=1; $i<=$order->get_item_count(); $i++){
             echo '<div class="woocusch-info form-field form-field-wide"><h3>' . __( '0'. $i .'. Customer Informations') . '</h3>';
             echo '<div><strong>'.__('Name').':</strong> ' . get_post_meta($order->get_id(), 'woocusch_customer_name_' . $i, true ) . '</div>';
-            echo '<div><strong>'.__('Email').':</strong> ' . get_post_meta($order->get_id(), 'woocusch_customer_email_' . $i, true ) . '</div></div>';
+            echo '<div><strong>'.__('Email').':</strong> ' . get_post_meta($order->get_id(), 'woocusch_customer_email_' . $i, true ) . '</div><div><strong>'.__('Date of birth').':</strong> ' . get_post_meta($order->get_id(), 'woocusch_customer_dob_' . $i, true ) . '</div></div>';
         }
     }
 
